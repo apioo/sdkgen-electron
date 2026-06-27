@@ -48,7 +48,7 @@ module.exports = {
             config: {
                 repository: {
                     owner: 'apioo',
-                    name: 'fusio-tools-electron'
+                    name: 'sdkgen-electron'
                 },
                 prerelease: true
             }
