@@ -1,15 +1,13 @@
-const {app, BrowserWindow, ipcMain, dialog} = require('electron')
+const {app, BrowserWindow, contextBridge, ipcMain, ipcRenderer, dialog} = require('electron')
 const path = require('path')
 const fs = require('fs');
 const started = require('electron-squirrel-startup')
-
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
 
-// 1. Handle picking a folder
 ipcMain.handle('dialog:select-directory', async () => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory']
@@ -18,23 +16,21 @@ ipcMain.handle('dialog:select-directory', async () => {
   if (result.canceled) {
     return null;
   } else {
-    return result.filePaths[0]; // Returns the full absolute path string
+    return result.filePaths[0];
   }
 });
 
-// 2. Handle writing the TypeSchema generated files
 ipcMain.handle('file:write-models', async (event, { outputDir, files }) => {
   try {
-    // Ensure directory exists
-    if (!fs.existsSync(outputDir)){
+    if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    // files array expectation: [{ filename: 'User.ts', content: 'export interface User...' }]
     for (const file of files) {
-      const filePath = path.join(outputDir, file.filename);
+      const filePath = path.join(outputDir, file.file);
       fs.writeFileSync(filePath, file.content, 'utf8');
     }
+
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
@@ -47,6 +43,9 @@ const createWindow = () => {
     width: 1024,
     height: 768,
     icon: path.join(__dirname, '../images/icon.png'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
   });
 
   // and load the index.html of the app.
