@@ -1,6 +1,6 @@
 {
   "name": "sdkgen",
-  "productName": "SDKgen",
+  "productName": "sdkgen",
   "version": "0.1.0",
   "description": "SDKgen Sandbox app",
   "repository": "github:apioo/sdkgen-electron",
